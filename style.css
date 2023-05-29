@@ -1,0 +1,111 @@
+@font-face {
+  font-family: "Elianto" ;
+  src: url(fonts/Elianto/Elianto-Regular.ttf);
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap');
+
+
+:root {
+  --font: 'Roboto', sans-serif;
+  --color1: #01012b ;
+  --color2: #005678 ;
+  --color3: #05d9e8 ;
+  --color4: #d1d7ff ;
+  --color5: #ff2a6d ;
+  
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: var(--font);
+}
+
+body {
+  height: 100vh;
+  background-image: linear-gradient(180deg, var(--color1) 80%, var(--color2));
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.header {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.header .head {
+  margin-top: 2rem;
+  font-family: "Elianto";
+  font-size: 4rem;
+  font-style: italic;
+  font-weight: bold;
+}
+
+.blue {
+  color: var(--color3);
+  text-shadow: 2px 2px 5px var(--color3);
+}
+
+.red {
+  color: var(--color5);
+  text-shadow: 2px 2px 5px var(--color5);
+}
+
+.gameboard {
+  display: grid;
+  width: 500px;
+  height: 500px;
+  margin: auto;
+  margin-top: 5rem;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+}
+
+.gameboard > * {
+ border: 2px solid var(--color4);
+}
+
+.gameboard div:nth-child(1),
+.gameboard div:nth-child(4),
+.gameboard div:nth-child(7)  {
+  border-left: none;
+}
+
+.gameboard div:nth-child(3),
+.gameboard div:nth-child(6),
+.gameboard div:nth-child(9)  {
+  border-right: none;
+}
+
+.gameboard div:nth-child(1),
+.gameboard div:nth-child(2),
+.gameboard div:nth-child(3)  {
+  border-top: none;
+}
+
+.gameboard div:nth-child(7),
+.gameboard div:nth-child(8),
+.gameboard div:nth-child(9)  {
+  border-bottom: none;
+}
+
+.gameboard div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 7rem;
+  user-select: none;
+  animation: showUp ease 1s;
+}
+
+@keyframes showUp {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
