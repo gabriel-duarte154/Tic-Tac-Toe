@@ -9,21 +9,16 @@ const game = (function () {
 			return { name, mark };
 		};
 
-		let curentMode;
 		const Player1 = Player('Player1', 'X');
 		const Player2 = Player('Player2', 'O');
 		let curentPLayer;
+		let curentMode;
 
 		const setMode = (mode) => {
 			curentMode = mode;
-			console.log(`[curent Mode]: ${curentMode}`);
 		};
 
 		setMode('player');
-
-		const getCurentMode = () => {
-			return curentMode;
-		};
 
 		const setCurrentPlayer = () => {
 			curentPLayer = curentPLayer === Player1 ? Player2 : Player1;
@@ -34,32 +29,14 @@ const game = (function () {
 		const playRound = (position) => {
 			if (isEmpty(position)) {
 				gameBoard.cells[position] = curentPLayer.mark;
-				if (gameStatus.checkForGameOver()) {
-					endGame(gameStatus.checkForGameOver());
+				if (!gameStatus.checkForGameOver()) {
+					setCurrentPlayer();
 				}
-				setCurrentPlayer();
 			}
 		};
 
 		const isEmpty = (position) => {
 			return gameBoard.cells[position] === undefined;
-		};
-
-		const getGameBoard = () => {
-			return gameBoard.cells;
-		};
-
-		const getCurentPLayer = () => {
-			return curentPLayer;
-		}
-
-		const endGame = (status) => {
-			if (status === 'tie') {
-				console.log("it's a tie");
-			}
-			if (status === 'winner') {
-				console.log(`${curentPLayer.name} win!`);
-			}
 		};
 
 		const gameStatus = (() => {
@@ -69,8 +46,8 @@ const game = (function () {
 
 			const row = values(0, 6, 3, 1);
 			const column = values(0, 3, 1, 3);
-			const fisrtDiagonal = values(0, 1, 1, 4);
-			const secondDigonal = values(2, 3, 1, 2);
+			const fisrtDiagonal = values(0, 0, 1, 4);
+			const secondDigonal = values(2, 2, 1, 2);
 
 			const checkForGameOver = () => {
 				if (checkForWinner()) {
@@ -83,6 +60,11 @@ const game = (function () {
 			};
 
 			const checkForWinner = () => {
+				console.log(`[row]--${verifyGameBoard(row)}`);
+				console.log(`[column]--${verifyGameBoard(column)}`);
+				console.log(`[first Diagonal]--${verifyGameBoard(fisrtDiagonal)}`);
+				console.log(`[second Digonal]--${verifyGameBoard(secondDigonal)}`);
+
 				return (
 					verifyGameBoard(row) ||
 					verifyGameBoard(column) ||
@@ -107,6 +89,11 @@ const game = (function () {
 							gameBoard.cells[i] === gameBoard.cells[i + nextCell] &&
 							gameBoard.cells[i] === gameBoard.cells[i + nextCell * 2]
 						) {
+							console.log('\n');
+							console.log(`Cell ${i}`)
+							console.log(`Cell ${i + nextCell}`)
+							console.log(`Cell ${i + nextCell * 2}`)
+							console.log('\n');
 							return true;
 						}
 					}
@@ -117,16 +104,43 @@ const game = (function () {
 			return { checkForGameOver };
 		})();
 
-		return { getGameBoard, playRound, setMode, getCurentMode, getCurentPLayer };
+		const getCurentMode = () => {
+			return curentMode;
+		};
+
+		const getGameBoard = () => {
+			return gameBoard.cells;
+		};
+
+		const getCurentPLayer = () => {
+			return curentPLayer;
+		};
+
+		const isGameOver = () => {
+			return gameStatus.checkForGameOver() ? true : false;
+		};
+
+		const getGameOverStatus = () => {
+			return gameStatus.checkForGameOver();
+		};
+
+		return {
+			getGameBoard,
+			playRound,
+			setMode,
+			getCurentMode,
+			getCurentPLayer,
+			isGameOver,
+			getGameOverStatus,
+		};
 	})();
 
 	const ScreenControler = (() => {
 		const GameBoard = (() => {
-			const turnDisplay = document.querySelector('.turnDisplay');
+			const gameScreen = document.querySelector('.gameContainer');
 			const gameBoardContainer = document.querySelector('.gameBoard');
-		
 
-			function creatCellContainer() {
+			function creatCells() {
 				let cells = [];
 				for (let i = 0; i < gameControler.getGameBoard().length; i++) {
 					let newCell = document.createElement('div');
@@ -143,9 +157,9 @@ const game = (function () {
 				});
 			}
 
-			const activeTurnDisplay = () => {
-				turnDisplay.style.display = 'flex'
-			}
+			const setGameScreen = () => {
+				gameScreen.classList.toggle('hidden');
+			};
 
 			const changeTurnDisplay = () => {
 				const playerMark = document.querySelector('.mark');
@@ -153,14 +167,22 @@ const game = (function () {
 			};
 
 			function init() {
-				creatCellContainer();
-				activeTurnDisplay();
+				creatCells();
+				setGameScreen();
 				changeTurnDisplay();
+			}
+
+			function removeEvents() {
+				let cells = [...gameBoardContainer.children];
+				cells.forEach((cell) => {
+					cell.removeEventListener('click', playRound);
+				});
 			}
 
 			return {
 				init,
 				changeTurnDisplay,
+				removeEvents,
 				gameBoardContainer,
 			};
 		})();
@@ -169,8 +191,7 @@ const game = (function () {
 			const playerBtn = document.querySelector('#playerBtn');
 			const IaBtn = document.querySelector('#iaBtn');
 			const startBtn = document.querySelector('#startBtn');
-			const MenuWrapper = document.querySelector('.wrapper');
-			const header = document.querySelector('.header')
+			const initialPage = document.querySelector('.inital-page');
 
 			function toggleBtn() {
 				if (gameControler.getCurentMode() === 'player') {
@@ -192,13 +213,12 @@ const game = (function () {
 			toggleBtn();
 
 			function closeMenuHeader() {
-				MenuWrapper.style.display = 'none';
-				header.style.display = 'none'
+				initialPage.classList.add('hidden');
 			}
 
 			startBtn.addEventListener('click', () => {
-				closeMenuHeader()
-				GameBoard.init()
+				closeMenuHeader();
+				GameBoard.init();
 			});
 		})();
 
@@ -217,9 +237,33 @@ const game = (function () {
 		}
 
 		const playRound = (event) => {
+			
 			gameControler.playRound(event.target.dataset.position);
-			GameBoard.changeTurnDisplay()
+			GameBoard.changeTurnDisplay();
 			render();
+			if (gameControler.isGameOver()) finishGame();
+		};
+
+		const finishGame = () => {
+			GameBoard.removeEvents();
+			openGameOverScreen();
+		};
+
+		const openGameOverScreen = () => {
+			const gameOverScreen = document.querySelector('.modal-gameOver');
+			gameOverScreen.classList.remove('hidden');
+			setGameOverMsg();
+		};
+
+		const setGameOverMsg = () => {
+			const span = document.querySelector('.game-status');
+
+			if (gameControler.getGameOverStatus() === 'winner') {
+				span.textContent = `${gameControler.getCurentPLayer().mark} Wins!`;
+			}
+			if (gameControler.getGameOverStatus() === 'tie') {
+				span.textContent = `It's a Tie.`;
+			}
 		};
 	})();
 })();

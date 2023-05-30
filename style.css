@@ -29,6 +29,10 @@ body {
   background-size: cover;
 }
 
+button {
+  cursor: pointer;
+}
+
 .header {
   display: flex;
   gap: 1rem;
@@ -38,9 +42,8 @@ body {
 .header .head {
   font-family: "Elianto";
   font-size: 5rem;
-  font-style: italic;
   font-weight: bold;
-  padding-top:1rem;
+  padding-top: 3rem;
 }
 
 .blue {
@@ -53,14 +56,85 @@ body {
   text-shadow: 2px 2px 5px var(--color5);
 }
 
+.inital-page {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.menu-wrapper {
+  display: flex;
+  flex-direction: column;
+  padding: 2rem;
+}
+
+.menu {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  height: 100px;
+  gap: 30px;
+}
+
+.menu .menuBtn {
+  width: 180px;
+  padding: .8rem;
+  border-radius: 10px;
+  background-color: #3f8ead8e;
+  color: white;
+  font-weight: bold;
+  border: none;
+  transition: .5s;
+  font-size: 1.2rem ;
+}
+
+.menu .menuBtn:hover {
+  background-color: #75a0b1be;
+}
+
+.active {
+  background-color: var(--color3) !important;
+  box-shadow: 1px 2px 5px var(--color3);  
+}
+
+.button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  padding-top: 2rem;
+}
+
+.button .startBtn {
+  border-radius: 5px;
+  padding: .5rem 2rem;
+  font-size: 1rem;
+  background-color: var(--color5);
+  color: white;
+  border: none;
+  box-shadow: 1px 2px 5px var(--color5);
+  transition: .5s;
+}
+
+.button .startBtn:hover {
+  transform: scale(1.1);
+  box-shadow: 2px 3px 10px var(--color5);
+}
+
+.button .startBtn:active {
+  transform: scale(.9);
+}
+
 .gameContainer{
-  display: none;
+  display: flex;
   flex-direction: column;
   height: 100vh;
-  justify-content: start;
   align-items: center;
   gap: 10rem;
-  padding-top: 2rem;
 }
 
 .gameBoard {
@@ -69,6 +143,7 @@ body {
   height: 400px;
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(3, 1fr);
+  margin-top: 3rem;
 }
 
 .gameBoard > * {
@@ -118,20 +193,87 @@ body {
   display: flex;
   margin-top: 1rem;
   gap: 15px;
-  border: 2px solid #0e536e;
   background-color: #126383b9;
   color: white;
   font-size: 1.5rem;
   padding: .5rem 1rem;
   border-radius: 10px;
   box-shadow: 1px 2px 5px rgba(0, 0, 0, 0.521);
-  
 }
 
 .turnDisplay .mark {
  font-weight: bold;
 
 }
+
+.modal-gameOver {
+  position: absolute;
+  height: 100vh;
+  width: 100vw;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  backdrop-filter: blur(2px);
+  background-color: rgba(0, 0, 0, 0.233);
+  animation: showUp 2s ease-in-out ;
+}
+
+.modal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 50px;
+  background-color: var(--color1);
+  border-radius: 5px;
+  height: 300px;
+  width: 100vw;
+}
+
+.congrats-msg {
+  display: flex;
+  gap: 10px;
+  font-size: 1.5rem;
+  align-items: center;
+  justify-content: center;
+}
+
+.congrats-container span {
+  font-size: 2.5rem ;
+}
+
+.modal-btn-container {
+  display: flex;
+  gap: 15px;
+
+}
+
+.modal-btn-container button {
+  font-size: 1.2rem;
+  padding: .8rem 2rem;
+  border-radius: 10px;
+  border: none;
+  transition: transform .5s;
+
+}
+
+.modal-btn-container .reset-btn {
+  background-color: var(--color5);
+  color: white;
+}
+
+.modal-btn-container .back-btn {
+  color: var(--color2);
+  border: 1px solid var(--color2);
+}
+
+.modal-btn-container button:active {
+  transform: scale(.9);
+}
+
 
 @keyframes showUp {
   from {
@@ -142,64 +284,6 @@ body {
   }
 }
 
-.wrapper {
-  display: flex;
-  padding: 2rem;
-  border-radius: 5px;
+.hidden {
+  display: none;
 }
-
-.menu {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: white;
-  height: 100px;
-  gap: 30px;
-  margin-bottom: 20px;
-}
-
-.menu .menuBtn {
-  width: 180px;
-  padding: .8rem;
-  border-radius: 10px;
-  background-color: #3f8ead8e;
-  color: white;
-  font-weight: bold;
-  border: none;
-  transition: .5s;
-  font-size: 1.2rem ;
-}
-
-.menu .menuBtn:hover {
-  background-color: #75a0b1be;
-}
-
-.active {
-  background-color: var(--color3) !important;
-  box-shadow: 1px 2px 5px var(--color3);  
-}
-
-.button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 10px;
-}
-
-.button .startBtn {
-  border-radius: 5px;
-  padding: .5rem;
-  font-size: 1rem;
-  background-color: var(--color5);
-  color: white;
-  border: none;
-  box-shadow: 1px 2px 5px var(--color5);
-  transition: 1s ;
-}
-
-.button .startBtn:hover {
-  background-color: #e04c7b;
-  box-shadow: 2px 3px 10px var(--color5);
-}
-
-

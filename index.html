@@ -9,33 +9,40 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="header">
-    <span class="head blue">Tic</span>
-    <span class="head red">Tac</span>
-    <span class="head blue">Toe</span>
+  <div class="inital-page">
+    <div class="header">
+      <span class="head blue">Tic</span>
+      <span class="head red">Tac</span>
+      <span class="head blue">Toe</span>
+    </div>
+    <div class="menu-wrapper">
+      <div class="menu">
+        <button class="menuBtn" id="playerBtn">Player vs Player</button>
+        <button class="menuBtn" id="iaBtn">Player vs IA</button>
+      </div>
+      <div class="button">
+      <button class="startBtn" id="startBtn">Start Game</button>
+      </div>
+    </div>
   </div>
 
-  <div class="wrapper">
-    <div class="menu">
-      <button class="menuBtn" id="playerBtn">Player vs Player</button>
-      <button class="menuBtn" id="iaBtn">Player vs IA</button>
-    </div>
-
-    <div class="button">
-    <button class="startBtn" id="startBtn">Start Game</button>
-    </div>
-  </div>
-
-  <div class="gameContainer">
+  <div class="gameContainer hidden">
     <div class="turnDisplay">
       <span class="mark"></span> Turn
     </div>
-
     <div class="gameBoard"></div>
 
+    <div class="modal-gameOver hidden">
+      <div class="modal">
+        <div class="congrats-container">
+          <div class="congrats-msg"> <span class="game-status"></span> </div>
+        </div>
+         <div class="modal-btn-container">
+          <button class="back-btn">Main Menu</button>
+          <button class="reset-btn">Try Again</button>
+         </div>
+      </div>
+    </div>
   </div>
-
-  
-  
 </body>
 </html>
