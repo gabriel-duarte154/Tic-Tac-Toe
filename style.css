@@ -10,7 +10,7 @@
   --font: 'Roboto', sans-serif;
   --color1: #01012b ;
   --color2: #005678 ;
-  --color3: #05d9e8 ;
+  --color3: #10beca ;
   --color4: #d1d7ff ;
   --color5: #ff2a6d ;
 }
@@ -24,7 +24,7 @@
 
 body {
   height: 100vh;
-  background-image: linear-gradient(180deg, var(--color1) 80%, var(--color2));
+  background-color: var(--color1);
   background-repeat: no-repeat;
   background-size: cover;
 }
@@ -36,11 +36,11 @@ body {
 }
 
 .header .head {
-  margin-top: 2rem;
   font-family: "Elianto";
-  font-size: 4rem;
+  font-size: 5rem;
   font-style: italic;
   font-weight: bold;
+  padding-top:1rem;
 }
 
 .blue {
@@ -53,51 +53,84 @@ body {
   text-shadow: 2px 2px 5px var(--color5);
 }
 
-.gameboard {
+.gameContainer{
+  display: none;
+  flex-direction: column;
+  height: 100vh;
+  justify-content: start;
+  align-items: center;
+  gap: 10rem;
+  padding-top: 2rem;
+}
+
+.gameBoard {
   display: grid;
-  width: 500px;
-  height: 500px;
-  margin: auto;
-  margin-top: 5rem;
+  width: 400px;
+  height: 400px;
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(3, 1fr);
 }
 
-.gameboard > * {
+.gameBoard > * {
  border: 2px solid var(--color4);
 }
 
-.gameboard div:nth-child(1),
-.gameboard div:nth-child(4),
-.gameboard div:nth-child(7)  {
+.gameBoard div:nth-child(1),
+.gameBoard div:nth-child(4),
+.gameBoard div:nth-child(7)  {
   border-left: none;
 }
 
-.gameboard div:nth-child(3),
-.gameboard div:nth-child(6),
-.gameboard div:nth-child(9)  {
+.gameBoard div:nth-child(3),
+.gameBoard div:nth-child(6),
+.gameBoard div:nth-child(9)  {
   border-right: none;
 }
 
-.gameboard div:nth-child(1),
-.gameboard div:nth-child(2),
-.gameboard div:nth-child(3)  {
+.gameBoard div:nth-child(1),
+.gameBoard div:nth-child(2),
+.gameBoard div:nth-child(3)  {
   border-top: none;
 }
 
-.gameboard div:nth-child(7),
-.gameboard div:nth-child(8),
-.gameboard div:nth-child(9)  {
+.gameBoard div:nth-child(7),
+.gameBoard div:nth-child(8),
+.gameBoard div:nth-child(9)  {
   border-bottom: none;
 }
 
-.gameboard div {
+.gameBoard div {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 7rem;
+  font-size: 6rem;
   user-select: none;
   animation: showUp ease 1s;
+  border-radius: 5px;
+  
+}
+
+.gameBoard div:hover {
+  background-color: #323261;
+}
+
+.turnDisplay {
+  display: flex;
+  margin-top: 1rem;
+  gap: 15px;
+  border: 2px solid #0e536e;
+  background-color: #126383b9;
+  color: white;
+  font-size: 1.5rem;
+  padding: .5rem 1rem;
+  border-radius: 10px;
+  box-shadow: 1px 2px 5px rgba(0, 0, 0, 0.521);
+  
+}
+
+.turnDisplay .mark {
+ font-weight: bold;
+
 }
 
 @keyframes showUp {
@@ -108,3 +141,65 @@ body {
     opacity: 1;
   }
 }
+
+.wrapper {
+  display: flex;
+  padding: 2rem;
+  border-radius: 5px;
+}
+
+.menu {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  height: 100px;
+  gap: 30px;
+  margin-bottom: 20px;
+}
+
+.menu .menuBtn {
+  width: 180px;
+  padding: .8rem;
+  border-radius: 10px;
+  background-color: #3f8ead8e;
+  color: white;
+  font-weight: bold;
+  border: none;
+  transition: .5s;
+  font-size: 1.2rem ;
+}
+
+.menu .menuBtn:hover {
+  background-color: #75a0b1be;
+}
+
+.active {
+  background-color: var(--color3) !important;
+  box-shadow: 1px 2px 5px var(--color3);  
+}
+
+.button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+}
+
+.button .startBtn {
+  border-radius: 5px;
+  padding: .5rem;
+  font-size: 1rem;
+  background-color: var(--color5);
+  color: white;
+  border: none;
+  box-shadow: 1px 2px 5px var(--color5);
+  transition: 1s ;
+}
+
+.button .startBtn:hover {
+  background-color: #e04c7b;
+  box-shadow: 2px 3px 10px var(--color5);
+}
+
+
