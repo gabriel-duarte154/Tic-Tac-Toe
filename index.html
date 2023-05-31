@@ -32,13 +32,28 @@
     </div>
     <div class="gameBoard"></div>
 
+    <div class="game-statistics">
+      <div class="x-wins card">
+        <div class="title">X</div>
+        <div id="xWins" class="score">0</div>
+      </div>
+      <div class="o-wins card" >
+        <div class="title">O</div>
+        <div id="oWins" class="score">0</div>
+      </div>
+      <div class="ties card">
+        <div class="title">Tie</div>
+        <div id="tie" class="score">0</div>
+      </div>
+    </div>
+
     <div class="modal-gameOver hidden">
       <div class="modal">
         <div class="congrats-container">
           <div class="congrats-msg"> <span class="game-status"></span> </div>
         </div>
          <div class="modal-btn-container">
-          <button class="back-btn">Main Menu</button>
+          <button class="back-main-btn">Main Menu</button>
           <button class="reset-btn">Try Again</button>
          </div>
       </div>

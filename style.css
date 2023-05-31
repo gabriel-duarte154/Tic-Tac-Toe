@@ -134,7 +134,7 @@ button {
   flex-direction: column;
   height: 100vh;
   align-items: center;
-  gap: 10rem;
+  gap: 5rem;
 }
 
 .gameBoard {
@@ -206,6 +206,34 @@ button {
 
 }
 
+.game-statistics {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-top: 2rem;
+  gap: 2rem;
+  width: 80%;
+}
+
+.game-statistics .card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  color: white;
+  padding: 10px;
+  gap: 10px;
+  width: max(15%, 200px);
+  font-size: 1.2rem;
+  background-color: #05435c;
+}
+
+.game-statistics .card .title {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
 .modal-gameOver {
   position: absolute;
   height: 100vh;
@@ -218,7 +246,7 @@ button {
   color: white;
   backdrop-filter: blur(2px);
   background-color: rgba(0, 0, 0, 0.233);
-  animation: showUp 2s ease-in-out ;
+  animation: showUp 1s ease-in-out ;
 }
 
 .modal {
@@ -265,7 +293,7 @@ button {
   color: white;
 }
 
-.modal-btn-container .back-btn {
+.modal-btn-container .back-main-btn {
   color: var(--color2);
   border: 1px solid var(--color2);
 }

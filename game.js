@@ -24,16 +24,45 @@ const game = (function () {
 			curentPLayer = curentPLayer === Player1 ? Player2 : Player1;
 		};
 
-		setCurrentPlayer();
-
 		const playRound = (position) => {
 			if (isEmpty(position)) {
 				gameBoard.cells[position] = curentPLayer.mark;
-				if (!gameStatus.checkForGameOver()) {
-					setCurrentPlayer();
-				}
+				verifyForGameOver();
 			}
 		};
+
+		const verifyForGameOver = () => {
+			if (gameStatus.checkForGameOver()) {
+				gameStatistics.updateStatistics(gameStatus.getGameOverStatus());
+				return;
+			}
+			setCurrentPlayer();
+		};
+
+		const gameStatistics = (() => {
+			let xWins = 0;
+			let oWins = 0;
+			let tie = 0;
+
+			const updateStatistics = (status) => {
+				if (status === 'tie') tie++;
+				if (status === 'winner') {
+					curentPLayer.mark === 'X' ? xWins++ : oWins++;
+				}
+			};
+
+			const reset = () => {
+				xWins = 0;
+				oWins = 0;
+				tie = 0;
+			};
+
+			const getGameStatistics = () => {
+				return { xWins, oWins, tie };
+			};
+
+			return { updateStatistics, getGameStatistics, reset };
+		})();
 
 		const isEmpty = (position) => {
 			return gameBoard.cells[position] === undefined;
@@ -49,22 +78,17 @@ const game = (function () {
 			const fisrtDiagonal = values(0, 0, 1, 4);
 			const secondDigonal = values(2, 2, 1, 2);
 
+			const getGameOverStatus = () => {
+				if (checkForGameOver()) {
+					return checkForWinner() ? 'winner' : 'tie';
+				}
+			};
+
 			const checkForGameOver = () => {
-				if (checkForWinner()) {
-					return 'winner';
-				}
-				if (checkForTie()) {
-					return 'tie';
-				}
-				return false;
+				return checkForWinner() || checkForTie();
 			};
 
 			const checkForWinner = () => {
-				console.log(`[row]--${verifyGameBoard(row)}`);
-				console.log(`[column]--${verifyGameBoard(column)}`);
-				console.log(`[first Diagonal]--${verifyGameBoard(fisrtDiagonal)}`);
-				console.log(`[second Digonal]--${verifyGameBoard(secondDigonal)}`);
-
 				return (
 					verifyGameBoard(row) ||
 					verifyGameBoard(column) ||
@@ -89,11 +113,6 @@ const game = (function () {
 							gameBoard.cells[i] === gameBoard.cells[i + nextCell] &&
 							gameBoard.cells[i] === gameBoard.cells[i + nextCell * 2]
 						) {
-							console.log('\n');
-							console.log(`Cell ${i}`)
-							console.log(`Cell ${i + nextCell}`)
-							console.log(`Cell ${i + nextCell * 2}`)
-							console.log('\n');
 							return true;
 						}
 					}
@@ -101,8 +120,12 @@ const game = (function () {
 				return false;
 			};
 
-			return { checkForGameOver };
+			return { checkForGameOver, getGameOverStatus };
 		})();
+
+		const setInitialConfigs = () => {
+			curentPLayer = Player1;
+		};
 
 		const getCurentMode = () => {
 			return curentMode;
@@ -117,12 +140,26 @@ const game = (function () {
 		};
 
 		const isGameOver = () => {
-			return gameStatus.checkForGameOver() ? true : false;
+			return gameStatus.checkForGameOver();
 		};
 
 		const getGameOverStatus = () => {
-			return gameStatus.checkForGameOver();
+			return gameStatus.getGameOverStatus();
 		};
+
+		const getGameStatistics = () => {
+			return gameStatistics.getGameStatistics();
+		};
+
+		const resetGameBoard = () => {
+			gameBoard.cells = new Array(9);
+		};
+
+		const resetStatistics = () => {
+			return gameStatistics.reset();
+		}
+
+		setInitialConfigs();
 
 		return {
 			getGameBoard,
@@ -132,6 +169,10 @@ const game = (function () {
 			getCurentPLayer,
 			isGameOver,
 			getGameOverStatus,
+			resetGameBoard,
+			setInitialConfigs,
+			getGameStatistics,
+			resetStatistics
 		};
 	})();
 
@@ -158,7 +199,11 @@ const game = (function () {
 			}
 
 			const setGameScreen = () => {
-				gameScreen.classList.toggle('hidden');
+				gameScreen.classList.remove('hidden');
+			};
+
+			const closeGameScreen = () => {
+				gameScreen.classList.add('hidden');
 			};
 
 			const changeTurnDisplay = () => {
@@ -179,12 +224,31 @@ const game = (function () {
 				});
 			}
 
+			function resetGameBoard() {
+				gameBoardContainer.innerHTML = '';
+			}
+
 			return {
 				init,
 				changeTurnDisplay,
 				removeEvents,
+				resetGameBoard,
+				closeGameScreen,
 				gameBoardContainer,
 			};
+		})();
+
+		const gameStatistics = (() => {
+			const statisticsContainers = document.querySelectorAll('.score');
+
+			const updateStatisticsDisplay = () => {
+				let statistics = gameControler.getGameStatistics();
+				statisticsContainers.forEach((container) => {
+					container.textContent = `${statistics[container.id]}`;
+				});
+			};
+
+			return { updateStatisticsDisplay };
 		})();
 
 		const initialScreen = (() => {
@@ -210,16 +274,80 @@ const game = (function () {
 				gameControler.setMode('ia');
 				toggleBtn();
 			});
+
 			toggleBtn();
 
 			function closeMenuHeader() {
 				initialPage.classList.add('hidden');
 			}
 
+			function openMenuHeader() {
+				initialPage.classList.remove('hidden');
+			}
+
 			startBtn.addEventListener('click', () => {
 				closeMenuHeader();
 				GameBoard.init();
 			});
+
+			return { openMenuHeader };
+		})();
+
+		const gameOver = (() => {
+			const gameOverScreen = document.querySelector('.modal-gameOver');
+			const resetBtn = document.querySelector('.reset-btn');
+			const bakcMainBtn = document.querySelector('.back-main-btn');
+
+			const finishGame = () => {
+				GameBoard.removeEvents();
+				openGameOverScreen();
+				setGameOverMsg();
+				gameStatistics.updateStatisticsDisplay();
+			};
+
+			const openGameOverScreen = () => {
+				gameOverScreen.classList.remove('hidden');
+			};
+
+			const closeGameOverScreen = () => {
+				gameOverScreen.classList.add('hidden');
+			};
+
+			const setGameOverMsg = () => {
+				const span = document.querySelector('.game-status');
+
+				if (gameControler.getGameOverStatus() === 'winner') {
+					span.textContent = `${gameControler.getCurentPLayer().mark} Wins!`;
+				}
+				if (gameControler.getGameOverStatus() === 'tie') {
+					span.textContent = `It's a Tie.`;
+				}
+			};
+
+			const newGameBoard = () => {
+				resetGame();
+				GameBoard.init();
+			};
+
+			const backMainMenu = () => {
+				resetGame();
+				gameControler.resetStatistics();
+				gameStatistics.updateStatisticsDisplay();
+				GameBoard.closeGameScreen();
+				initialScreen.openMenuHeader();
+			};
+
+			const resetGame = () => {
+				gameControler.setInitialConfigs();
+				gameControler.resetGameBoard();
+				GameBoard.resetGameBoard();
+				closeGameOverScreen();
+			};
+
+			resetBtn.addEventListener('click', newGameBoard);
+			bakcMainBtn.addEventListener('click', backMainMenu);
+
+			return { finishGame };
 		})();
 
 		function render() {
@@ -237,33 +365,10 @@ const game = (function () {
 		}
 
 		const playRound = (event) => {
-			
 			gameControler.playRound(event.target.dataset.position);
 			GameBoard.changeTurnDisplay();
 			render();
-			if (gameControler.isGameOver()) finishGame();
-		};
-
-		const finishGame = () => {
-			GameBoard.removeEvents();
-			openGameOverScreen();
-		};
-
-		const openGameOverScreen = () => {
-			const gameOverScreen = document.querySelector('.modal-gameOver');
-			gameOverScreen.classList.remove('hidden');
-			setGameOverMsg();
-		};
-
-		const setGameOverMsg = () => {
-			const span = document.querySelector('.game-status');
-
-			if (gameControler.getGameOverStatus() === 'winner') {
-				span.textContent = `${gameControler.getCurentPLayer().mark} Wins!`;
-			}
-			if (gameControler.getGameOverStatus() === 'tie') {
-				span.textContent = `It's a Tie.`;
-			}
+			if (gameControler.isGameOver()) gameOver.finishGame();
 		};
 	})();
 })();
