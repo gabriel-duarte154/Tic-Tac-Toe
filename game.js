@@ -9,6 +9,25 @@ const game = (function () {
 			return { name, mark };
 		};
 
+		const modeIa = (() => {
+			const getPosibleMoves = () => {
+				let posibelMoves = [];
+				for (let index = 0; index < gameBoard.cells.length; index++) {
+					if (isEmpty(index)) {
+						posibelMoves.push(index);
+					}
+				}
+				return posibelMoves;
+			};
+			const getIaMove = () => {
+				let posibleMoves = getPosibleMoves();
+				let index = Math.floor(Math.random() * posibleMoves.length);
+				return posibleMoves[index];
+			};
+
+			return { getIaMove };
+		})();
+
 		const Player1 = Player('Player1', 'X');
 		const Player2 = Player('Player2', 'O');
 		let curentPLayer;
@@ -157,7 +176,11 @@ const game = (function () {
 
 		const resetStatistics = () => {
 			return gameStatistics.reset();
-		}
+		};
+
+		const getMode = () => {
+			return curentMode;
+		};
 
 		setInitialConfigs();
 
@@ -172,7 +195,8 @@ const game = (function () {
 			resetGameBoard,
 			setInitialConfigs,
 			getGameStatistics,
-			resetStatistics
+			resetStatistics,
+			getMode,
 		};
 	})();
 
@@ -256,6 +280,21 @@ const game = (function () {
 			const IaBtn = document.querySelector('#iaBtn');
 			const startBtn = document.querySelector('#startBtn');
 			const initialPage = document.querySelector('.inital-page');
+			const modeMenu = document.querySelector('.menu-wrapper');
+
+			const iaMenu = (() => {
+				const menu = document.querySelector('.menu-ia-mode');
+
+				const open = () => {
+					menu.classList.remove('hidden');
+				};
+
+				const close = () => {
+					menu.classList.add('hidden');
+				};
+
+				return { open, close };
+			})();
 
 			function toggleBtn() {
 				if (gameControler.getCurentMode() === 'player') {
@@ -266,6 +305,25 @@ const game = (function () {
 					IaBtn.classList.add('active');
 				}
 			}
+
+			const InitializeGame = () => {
+				if (gameControler.getMode() === 'ia') {
+					startIaMode();
+					return;
+				}
+				startPlayerMode();
+			};
+
+			const startIaMode = () => {
+				closeModeMenu();
+				iaMenu.open();
+			};
+
+			const startPlayerMode = () => {
+				closeMenuHeader();
+				GameBoard.init();
+			};
+
 			playerBtn.addEventListener('click', () => {
 				gameControler.setMode('player');
 				toggleBtn();
@@ -277,6 +335,10 @@ const game = (function () {
 
 			toggleBtn();
 
+			function closeModeMenu() {
+				modeMenu.classList.add('hidden');
+			}
+
 			function closeMenuHeader() {
 				initialPage.classList.add('hidden');
 			}
@@ -285,10 +347,7 @@ const game = (function () {
 				initialPage.classList.remove('hidden');
 			}
 
-			startBtn.addEventListener('click', () => {
-				closeMenuHeader();
-				GameBoard.init();
-			});
+			startBtn.addEventListener('click', InitializeGame);
 
 			return { openMenuHeader };
 		})();

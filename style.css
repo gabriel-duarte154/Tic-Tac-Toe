@@ -129,6 +129,58 @@ button {
   transform: scale(.9);
 }
 
+.menu-ia-mode {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 120px;
+  margin-top: 4rem;
+  gap: 2rem;
+  border-radius: 10px;
+  min-width: 400px;
+  overflow: hidden;
+  animation: growUp 1.1s ease-in-out;
+}
+
+@keyframes growUp {
+  from {
+    height: 0;
+    opacity: 0;
+  }
+  to {
+    height: 120px;
+    opacity: 1;
+  }
+}
+
+.menu-ia-mode .menu-ia-header {
+  color: white;
+  font-size: 2rem;
+}
+
+.dificulties-container {
+  display: flex;
+  gap: 1rem;
+}
+
+.dificulties-container button {
+  display: flex;
+  justify-content: center;
+  width: 120px;
+  font-size: 1.3rem;
+  padding: .5rem 2rem;
+  border-radius: 10px;
+  border: none;
+  color: white;
+  box-shadow: 1px 2px 5px var(--color5) ;
+  background-color: var(--color5);
+  transition: .5s;
+}
+
+.dificulties-container button:hover {
+  background-color: #f75286;
+}
+
 .gameContainer{
   display: flex;
   flex-direction: column;
