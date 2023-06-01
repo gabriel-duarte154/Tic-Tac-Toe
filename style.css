@@ -139,18 +139,7 @@ button {
   border-radius: 10px;
   min-width: 400px;
   overflow: hidden;
-  /* animation: growUp 1.9s ease-in-out; */
-}
-
-@keyframes growUp {
-  from {
-    height: 0;
-    opacity: 0;
-  }
-  to {
-    height: 270px;
-    opacity: 1;
-  }
+  animation: showUp .8s ease-in-out;
 }
 
 .menu-ia-mode .title {
