@@ -10,6 +10,56 @@ const game = (function () {
 		};
 
 		const modeIa = (() => {
+			let iaPlay = false;
+			let iaTurn = false;
+
+			const setIaTurn = () => {
+				iaTurn = iaTurn === true ? false : true;
+			};
+
+			const activeIaTurn = () => {
+				iaTurn = true;
+			};
+
+			const desativeIaturn = () => {
+				iaTurn = false;
+			};
+
+			const setIaMark = () => {
+				iaPlay = iaPlay ? false : true;
+			};
+
+			const iaPlayFirst = () => {
+				return iaPlay;
+			};
+
+			const playRound = (position) => {
+				console.log(curentPLayer);
+				console.log(iaTurn);
+
+				if (!iaTurn) {
+					playerMove(position);
+				}
+
+				if (iaTurn) {
+					if (gameStatus.checkForGameOver()) return;
+					addMark(getIaMove());
+					setIaTurn();
+					setCurrentPlayer();
+				}
+			};
+
+			const playerMove = (position) => {
+				if (isEmpty(position)) {
+					addMark(position);
+					setCurrentPlayer();
+					if (!gameStatus.checkForGameOver()) {
+						setIaTurn();
+						playRound();
+					}
+				}
+			};
+
 			const getPosibleMoves = () => {
 				let posibelMoves = [];
 				for (let index = 0; index < gameBoard.cells.length; index++) {
@@ -25,7 +75,13 @@ const game = (function () {
 				return posibleMoves[index];
 			};
 
-			return { getIaMove };
+			return {
+				playRound,
+				setIaMark,
+				iaPlayFirst,
+				activeIaTurn,
+				desativeIaturn,
+			};
 		})();
 
 		const Player1 = Player('Player1', 'X');
@@ -40,22 +96,40 @@ const game = (function () {
 		setMode('player');
 
 		const setCurrentPlayer = () => {
+			if (gameStatus.checkForGameOver()) return;
 			curentPLayer = curentPLayer === Player1 ? Player2 : Player1;
 		};
 
 		const playRound = (position) => {
-			if (isEmpty(position)) {
-				gameBoard.cells[position] = curentPLayer.mark;
-				verifyForGameOver();
+			if (curentMode === 'player') {
+				playerMode(position);
 			}
+
+			if (curentMode === 'ia') {
+				modeIa.playRound(position);
+			}
+			verifyForGameOver();
+		};
+
+		const isPosibleMove = (position) => {
+			if (isEmpty(position)) {
+				addMark(position);
+			}
+			setCurrentPlayer();
+		};
+
+		const addMark = (position) => {
+			gameBoard.cells[position] = curentPLayer.mark;
+		};
+
+		const playerMode = (position) => {
+			isPosibleMove(position);
 		};
 
 		const verifyForGameOver = () => {
 			if (gameStatus.checkForGameOver()) {
 				gameStatistics.updateStatistics(gameStatus.getGameOverStatus());
-				return;
 			}
-			setCurrentPlayer();
 		};
 
 		const gameStatistics = (() => {
@@ -144,6 +218,12 @@ const game = (function () {
 
 		const setInitialConfigs = () => {
 			curentPLayer = Player1;
+
+			if (modeIa.iaPlayFirst()) {
+				modeIa.activeIaTurn();
+			} else {
+				modeIa.desativeIaturn();
+			}
 		};
 
 		const getCurentMode = () => {
@@ -197,6 +277,7 @@ const game = (function () {
 			getGameStatistics,
 			resetStatistics,
 			getMode,
+			modeIa,
 		};
 	})();
 
@@ -284,6 +365,25 @@ const game = (function () {
 
 			const iaMenu = (() => {
 				const menu = document.querySelector('.menu-ia-mode');
+				const dificultiesBtns = document.querySelector(
+					'.dificulties-container'
+				);
+				const markContainer = document.querySelector('.mark-container');
+				const BtnX = document.querySelector('#btn-x');
+				const BtnO = document.querySelector('#btn-o');
+
+				const startIaMode = (event) => {
+					if (event.target.matches('.dificult')) {
+						close();
+						closeMenuHeader();
+						GameBoard.init();
+						if (gameControler.modeIa.iaPlayFirst()) {
+							gameControler.modeIa.activeIaTurn();
+							gameControler.playRound();
+							render();
+						}
+					}
+				};
 
 				const open = () => {
 					menu.classList.remove('hidden');
@@ -292,6 +392,26 @@ const game = (function () {
 				const close = () => {
 					menu.classList.add('hidden');
 				};
+
+				const setMark = () => {
+					gameControler.modeIa.setIaMark();
+					toggleBtn();
+				};
+
+				const toggleBtn = () => {
+					if (gameControler.modeIa.iaPlayFirst()) {
+						BtnO.classList.add('active-option');
+						BtnX.classList.remove('active-option');
+					} else {
+						BtnO.classList.remove('active-option');
+						BtnX.classList.add('active-option');
+					}
+				};
+
+				toggleBtn();
+
+				dificultiesBtns.addEventListener('click', startIaMode);
+				markContainer.addEventListener('click', setMark);
 
 				return { open, close };
 			})();
@@ -339,6 +459,10 @@ const game = (function () {
 				modeMenu.classList.add('hidden');
 			}
 
+			function openModeMenu() {
+				modeMenu.classList.remove('hidden');
+			}
+
 			function closeMenuHeader() {
 				initialPage.classList.add('hidden');
 			}
@@ -349,7 +473,7 @@ const game = (function () {
 
 			startBtn.addEventListener('click', InitializeGame);
 
-			return { openMenuHeader };
+			return { openMenuHeader, openModeMenu };
 		})();
 
 		const gameOver = (() => {
@@ -386,6 +510,10 @@ const game = (function () {
 			const newGameBoard = () => {
 				resetGame();
 				GameBoard.init();
+				if (gameControler.modeIa.iaPlayFirst()) {
+					gameControler.playRound();
+					render();
+				}
 			};
 
 			const backMainMenu = () => {
@@ -394,12 +522,13 @@ const game = (function () {
 				gameStatistics.updateStatisticsDisplay();
 				GameBoard.closeGameScreen();
 				initialScreen.openMenuHeader();
+				initialScreen.openModeMenu();
 			};
 
 			const resetGame = () => {
-				gameControler.setInitialConfigs();
 				gameControler.resetGameBoard();
 				GameBoard.resetGameBoard();
+				gameControler.setInitialConfigs();
 				closeGameOverScreen();
 			};
 
@@ -411,6 +540,8 @@ const game = (function () {
 
 		function render() {
 			let cells = [...GameBoard.gameBoardContainer.children];
+
+			console.log(cells)
 
 			for (let i = 0; i < gameControler.getGameBoard().length; i++) {
 				cells[i].style.color =
