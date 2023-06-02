@@ -3,6 +3,10 @@ const game = (function () {
 		const gameBoard = (function () {
 			let cells = new Array(9);
 
+			const isEmpty = (position) => {
+				return gameBoard.cells[position] === undefined;
+			};
+
 			const setMarkForIalogic = (cell, player) => {
 				if (player === undefined) {
 					cells[cell] = undefined;
@@ -15,9 +19,18 @@ const game = (function () {
 				for (let i = 0; i < cells.length; i++) {
 					cells[i] = undefined;
 				}
+			};
+
+			const isClear = () => {
+				for (let i = 0; i < gameBoard.cells.length; i++) {
+					if (gameBoard.cells[i] != undefined) {
+						return false
+					}
+				}
+				return true
 			}
 
-			return { cells, setMarkForIalogic, clear };
+			return { cells, setMarkForIalogic, clear, isEmpty, isClear };
 		})();
 
 		const Player = (name, mark) => {
@@ -38,8 +51,7 @@ const game = (function () {
 		const playRound = (position) => {
 			if (isGameOver()) return;
 			if (curentMode === 'player') {
-				playerMode(position);
-				console.log(gameBoard.cells)
+				setPlayerMove(position);
 			}
 			if (curentMode === 'ia') {
 				modeIa.playRound(position);
@@ -47,8 +59,8 @@ const game = (function () {
 			verifyForGameOver();
 		};
 
-		const playerMode = (position) => {
-			if (isEmpty(position)) {
+		const setPlayerMove = (position) => {
+			if (gameBoard.isEmpty(position)) {
 				addMark(position);
 				setCurrentPlayer();
 			}
@@ -67,10 +79,6 @@ const game = (function () {
 			if (isGameOver()) {
 				gameStatistics.update(gameStatus.getGameOverStatus(gameBoard.cells));
 			}
-		};
-
-		const isEmpty = (position) => {
-			return gameBoard.cells[position] === undefined;
 		};
 
 		const modeIa = (() => {
@@ -105,50 +113,28 @@ const game = (function () {
 				addMark(iaLogic.chooseForCell());
 				desativeIaTurn();
 				setCurrentPlayer();
-				ScreenControler.render();
-				if (isGameOver()) {
-					ScreenControler.gameOver.finishGame();
-				}
-				ScreenControler.updateTurnDisplay();
-				ScreenControler.addCellsEvents();
+				updateScreen();
+				if (isGameOver()) ScreenControler.gameOver.finishGame();
 			};
 
 			const playerMove = (position) => {
-				if (isEmpty(position)) {
-					addMark(position);
-					setCurrentPlayer();
-					if (!isGameOver()) {
-						ScreenControler.removeCellEvents();
-						setTimeout(() => {
-							activeIaTurn();
-							playRound();
-						}, 500);
-					}
+				if (!gameBoard.isEmpty(position)) return;
+				setPlayerMove(position);
+
+				if (!isGameOver()) {
+					ScreenControler.removeCellEvents();
+					setTimeout(() => {
+						activeIaTurn();
+						playRound();
+					}, 300);
 				}
 			};
 
-			const getIaMove = () => {
-				let posibleMoves = getEmptyCells();
-				let index = Math.floor(Math.random() * posibleMoves.length);
-				return posibleMoves[index];
-			};
-
-			const getEmptyCells = () => {
-				let emptyCells = [];
-				for (let index = 0; index < gameBoard.cells.length; index++) {
-					if (isEmpty(index)) {
-						emptyCells.push(index);
-					}
-				}
-				return emptyCells;
-			};
-
-			const getIaPLayer = () => {
-				return iaMakeFirstMove ? 'X' : 'O';
-			};
-
-			const getPLayer = () => {
-				return iaMakeFirstMove ? 'O' : 'X';
+			const updateScreen = () => {
+				ScreenControler.render();
+				verifyForGameOver();
+				ScreenControler.updateTurnDisplay();
+				ScreenControler.addCellsEvents();
 			};
 
 			const iaLogic = (() => {
@@ -172,13 +158,40 @@ const game = (function () {
 					let value = Math.floor(Math.random() * (100 + 1));
 					let choice;
 
-					if (value <= iaPrecision) {
+					if (value <= iaPrecision && !gameBoard.isClear()) {
+						console.log('Best move');
 						choice = minimax(gameBoard, getIaPLayer()).index;
+						console.log(choice)
 					} else {
+						console.log('Not best move');
 						choice = getIaMove();
 					}
 
 					return choice;
+				};
+
+				const getIaMove = () => {
+					let posibleMoves = getEmptyCells();
+					let index = Math.floor(Math.random() * posibleMoves.length);
+					return posibleMoves[index];
+				};
+
+				const getEmptyCells = () => {
+					let emptyCells = [];
+					for (let index = 0; index < gameBoard.cells.length; index++) {
+						if (gameBoard.isEmpty(index)) {
+							emptyCells.push(index);
+						}
+					}
+					return emptyCells;
+				};
+
+				const getIaPLayer = () => {
+					return iaMakeFirstMove ? 'X' : 'O';
+				};
+
+				const getPLayer = () => {
+					return iaMakeFirstMove ? 'O' : 'X';
 				};
 
 				const findBestMove = (moves, player) => {
@@ -201,6 +214,7 @@ const game = (function () {
 							}
 						}
 					}
+
 					return moves[bestMove];
 				};
 
@@ -340,7 +354,12 @@ const game = (function () {
 				return false;
 			};
 
-			return { checkForGameOver, getGameOverStatus, checkForTie, checkForWinner };
+			return {
+				checkForGameOver,
+				getGameOverStatus,
+				checkForTie,
+				checkForWinner,
+			};
 		})();
 
 		const setIaconfigs = () => {
@@ -367,7 +386,7 @@ const game = (function () {
 		};
 
 		const resetGameBoard = () => {
-			return gameBoard.clear()
+			return gameBoard.clear();
 		};
 
 		const getCurentPLayer = () => {
@@ -654,13 +673,13 @@ const game = (function () {
 			const backMainMenu = () => {
 				resetGame();
 				gameControler.resetStatistics();
-				gameStatistics.updateStatisticsDisplay();
 				GameBoard.closeGameScreen();
 				initialScreen.openInitialPage();
 				initialScreen.openModeMenu();
 			};
 
 			const resetGame = () => {
+				gameStatistics.updateStatisticsDisplay();
 				gameControler.resetGameBoard();
 				GameBoard.resetGameBoard();
 				gameControler.setInitialConfigs();
