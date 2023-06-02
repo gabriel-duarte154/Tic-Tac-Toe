@@ -15,22 +15,27 @@ const game = (function () {
 				cells[cell] = player;
 			};
 
+			const setMark = (index, mark) => {
+				gameBoard.cells[index] = mark;
+			};
+
 			const clear = () => {
 				for (let i = 0; i < cells.length; i++) {
 					cells[i] = undefined;
 				}
 			};
 
-			const isClear = () => {
-				for (let i = 0; i < gameBoard.cells.length; i++) {
-					if (gameBoard.cells[i] != undefined) {
-						return false
+			const getEmptyIdx = () => {
+				let empty = [];
+				for (let i = 0; i < 9; i++) {
+					if (gameBoard.cells[i] === undefined) {
+						empty.push(i);
 					}
 				}
-				return true
-			}
+				return empty;
+			};
 
-			return { cells, setMarkForIalogic, clear, isEmpty, isClear };
+			return { cells, setMarkForIalogic, clear, isEmpty, getEmptyIdx, setMark };
 		})();
 
 		const Player = (name, mark) => {
@@ -61,7 +66,7 @@ const game = (function () {
 
 		const setPlayerMove = (position) => {
 			if (gameBoard.isEmpty(position)) {
-				addMark(position);
+				gameBoard.setMark(position, curentPLayer.mark);
 				setCurrentPlayer();
 			}
 		};
@@ -69,10 +74,6 @@ const game = (function () {
 		const setCurrentPlayer = () => {
 			if (isGameOver()) return;
 			curentPLayer = curentPLayer === Player1 ? Player2 : Player1;
-		};
-
-		const addMark = (position) => {
-			gameBoard.cells[position] = curentPLayer.mark;
 		};
 
 		const verifyForGameOver = () => {
@@ -102,6 +103,7 @@ const game = (function () {
 			};
 
 			const playRound = (position) => {
+				console.log(iaMakeFirstMove);
 				if (iaTurn) {
 					iaMove();
 					return;
@@ -110,7 +112,7 @@ const game = (function () {
 			};
 
 			const iaMove = () => {
-				addMark(iaLogic.chooseForCell());
+				gameBoard.setMark(iaLogic.chooseForCell(), curentPLayer.mark);
 				desativeIaTurn();
 				setCurrentPlayer();
 				updateScreen();
@@ -140,16 +142,6 @@ const game = (function () {
 			const iaLogic = (() => {
 				let iaPrecision;
 
-				const getEmptyIdx = (gameBoard) => {
-					let empty = [];
-					for (let i = 0; i < 9; i++) {
-						if (gameBoard[i] === undefined) {
-							empty.push(i);
-						}
-					}
-					return empty;
-				};
-
 				const setIaPrecision = (pocentage) => {
 					iaPrecision = pocentage;
 				};
@@ -158,12 +150,9 @@ const game = (function () {
 					let value = Math.floor(Math.random() * (100 + 1));
 					let choice;
 
-					if (value <= iaPrecision && !gameBoard.isClear()) {
-						console.log('Best move');
+					if (value <= iaPrecision) {
 						choice = minimax(gameBoard, getIaPLayer()).index;
-						console.log(choice)
 					} else {
-						console.log('Not best move');
 						choice = getIaMove();
 					}
 
@@ -205,7 +194,7 @@ const game = (function () {
 								bestMove = i;
 							}
 						}
-					} else {
+					} else if (player === getPLayer()) {
 						let bestScore = 10000;
 						for (let i = 0; i < moves.length; i++) {
 							if (moves[i].score < bestScore) {
@@ -219,22 +208,22 @@ const game = (function () {
 				};
 
 				const minimax = (newGameBord, player) => {
-					let emptyCells = getEmptyIdx(newGameBord.cells);
+					let emptyCells = newGameBord.getEmptyIdx();
 
-					if (gameStatus.checkForTie(newGameBord.cells)) {
-						return {
-							score: 0,
-						};
-					} else if (gameStatus.checkForWinner(newGameBord.cells)) {
-						if (player != getIaPLayer()) {
+					if (gameStatus.checkForWinner(newGameBord.cells)) {
+						if (player === getPLayer()) {
 							return {
 								score: 10,
 							};
-						} else {
+						} else if (player === getIaPLayer()) {
 							return {
 								score: -10,
 							};
 						}
+					} else if (gameStatus.checkForTie(newGameBord.cells)) {
+						return {
+							score: 0,
+						};
 					}
 
 					let moves = [];
@@ -248,7 +237,7 @@ const game = (function () {
 						if (player === getIaPLayer()) {
 							let result = minimax(newGameBord, getPLayer());
 							move.score = result.score;
-						} else {
+						} else if (player === getPLayer()) {
 							let result = minimax(newGameBord, getIaPLayer());
 							move.score = result.score;
 						}
@@ -329,6 +318,7 @@ const game = (function () {
 			};
 
 			const checkForTie = (gameBoard) => {
+				if (checkForWinner(gameBoard)) return false;
 				for (let i = 0; i < gameBoard.length; i++) {
 					if (gameBoard[i] === undefined) {
 						return false;
@@ -671,8 +661,8 @@ const game = (function () {
 			};
 
 			const backMainMenu = () => {
-				resetGame();
 				gameControler.resetStatistics();
+				resetGame();
 				GameBoard.closeGameScreen();
 				initialScreen.openInitialPage();
 				initialScreen.openModeMenu();
