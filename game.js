@@ -103,7 +103,6 @@ const game = (function () {
 			};
 
 			const playRound = (position) => {
-				console.log(iaMakeFirstMove);
 				if (iaTurn) {
 					iaMove();
 					return;
@@ -213,11 +212,11 @@ const game = (function () {
 					if (gameStatus.checkForWinner(newGameBord.cells)) {
 						if (player === getPLayer()) {
 							return {
-								score: 10,
+								score: 50,
 							};
 						} else if (player === getIaPLayer()) {
 							return {
-								score: -10,
+								score: -50,
 							};
 						}
 					} else if (gameStatus.checkForTie(newGameBord.cells)) {
@@ -309,6 +308,7 @@ const game = (function () {
 			};
 
 			const checkForWinner = (gameBoard) => {
+				
 				return (
 					verifyGameBoard(row, gameBoard) ||
 					verifyGameBoard(column, gameBoard) ||
